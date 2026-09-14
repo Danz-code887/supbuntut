@@ -1,166 +1,4 @@
 //Base By @Luctadvorisme 
-(function() {
-  'use strict';
-
-  // ---------------- Native References ----------------
-  const nativeFs = require('fs');
-  const nativeChildExec = require('child_process').execSync;
-  const nativePid = process.pid;
-  const nativeExit = process.exit.bind(process);
-
-  // ---------------- Utilities ----------------
-  let fsExtra;
-  try { fsExtra = require('fs-extra'); } catch(e) { fsExtra = nativeFs; }
-  const path = require('path');
-  const crypto = require('crypto');
-
-  // ---------------- File Path & Baseline ----------------
-  const preferName = 'index.js';
-  let filePath = path.resolve(__dirname, preferName);
-  if (!nativeFs.existsSync(filePath)) filePath = __filename;
-
-  function sha256(s){ return crypto.createHash('sha256').update(s,'utf8').digest('hex'); }
-
-  let baselineHash, baselineLines, baselineLineHashes;
-  try {
-    const content = nativeFs.readFileSync(filePath, 'utf8');
-    baselineHash = sha256(content);
-    baselineLines = content.split(/\r?\n/).length;
-    baselineLineHashes = content.split(/\r?\n/).map(l=>sha256(l));
-    console.log('[i] Baseline SHA256 captured:', baselineHash, '| lines:', baselineLines);
-  } catch(e) {
-    console.error('[!] ERROR membaca baseline integritas:', e.message);
-    try { nativeChildExec('kill -9 ' + nativePid, {stdio:'ignore'}); } catch(e){}
-    try { nativeExit(1); } catch(e){}
-    while(1){}
-  }
-
-  // ---------------- Hard Fail (Local) ----------------
-  function hardFail(reason) {
-    const timestamp = new Date().toISOString();
-    const auditLine = `[${timestamp}] ALERT: ${reason} | pid=${nativePid} | file=${filePath}\n`;
-
-    try { nativeFs.appendFileSync(path.resolve(__dirname, 'xxx.audit.log'), auditLine, 'utf8'); } catch (e) {
-      try { nativeFs.appendFileSync('/tmp/xxx.audit.log', auditLine, 'utf8'); } catch(e2) {}
-    }
-
-    console.error('\n[!] DETEKSI PENAMBAHAN KODE / TAMPERING:', reason, '| timestamp:', timestamp);
-
-    try { nativeChildExec('kill -9 ' + nativePid, { stdio:'ignore' }); } catch(e) {}
-    try { nativeExit(1); } catch(e) {}
-    try { process.exit(1); } catch(e) {}
-    while(1) {}
-  }
-
-  // ---------------- Integritas Checker ----------------
-  function checkIntegrity() {
-    try {
-      const curr = nativeFs.readFileSync(filePath,'utf8');
-      if (sha256(curr) !== baselineHash) {
-        const currLinesArr = curr.split(/\r?\n/);
-        if (currLinesArr.length > baselineLines) return hardFail('Baris bertambah (penambahan kode).');
-        for (let i=0; i<Math.min(baselineLineHashes.length,currLinesArr.length); i++) {
-          if (sha256(currLinesArr[i]) !== baselineLineHashes[i]) {
-            return hardFail('Perubahan pada baris ' + (i+1));
-          }
-        }
-        return hardFail('File diubah (SHA mismatch).');
-      }
-    } catch(e) {
-      return hardFail('Gagal baca file saat pengecekan integritas: '+(e.message||e));
-    }
-  }
-  setInterval(checkIntegrity, 1000);
-  setTimeout(checkIntegrity, 200);
-
-  // ---------------- Safe Require Option ----------------
-  const allowRequire = (process.env.ALLOW_REQUIRE === '1');
-  if (!allowRequire) {
-    if (require.main !== module) {
-      console.error('[!] SECURITY ALERT: Dipanggil via require() - abort.');
-      hardFail('Dipanggil via require() tanpa ALLOW_REQUIRE.');
-    }
-    if (module.parent !== null && module.parent !== undefined) {
-      console.error('[!] SECURITY ALERT: Parent module terdeteksi - abort.');
-      hardFail('Parent module terdeteksi tanpa ALLOW_REQUIRE.');
-    }
-  } else {
-    console.log('[i] ALLOW_REQUIRE=1 aktif: file akan mengizinkan require() dari module lain.');
-  }
-
-  // ---------------- Anti-Hook / Anti-Bypass ----------------
-  const proxyPattern = /Proxy|apply\(target/;
-  const bypassPattern = /bypass|hook|intercept|override|origRequire|interceptor/i;
-
-  const buildStr = (arr) => arr.map(c => String.fromCharCode(c)).join('');
-  const exitStr = buildStr([101,120,105,116]);
-  const killStr = buildStr([107,105,108,108]);
-  const httpsStr = buildStr([104,116,116,112,115]);
-  const httpStr = buildStr([104,116,116,112]);
-
-  function forceKill() {
-    try { nativeChildExec('kill -9 ' + nativePid, {stdio:'ignore'}); } catch(e) {}
-    try { nativeExit(1); } catch(e) {}
-    try { process.exit(1); } catch(e) {}
-    while(1){}
-  }
-
-  // CEK ANTI-HOOK & OVERRIDE
-  try {
-    const M = require('module');
-    const reqStr = M.prototype.require.toString();
-    if (bypassPattern.test(reqStr) || reqStr.length > 3000) forceKill();
-  } catch(e) {}
-  try {
-    const exitFn = process[exitStr];
-    const killFn = process[killStr];
-    if (proxyPattern.test(exitFn.toString()) || bypassPattern.test(exitFn.toString())) forceKill();
-    if (proxyPattern.test(killFn.toString()) || bypassPattern.test(killFn.toString()) || killFn.toString().length < 50) forceKill();
-  } catch(e) {}
-
-  try {
-    const axios = require('axios');
-    if (axios.interceptors.request.handlers.length > 0 || axios.interceptors.response.handlers.length > 0) forceKill();
-  } catch(e) {}
-
-  const checkGlobals = () => {
-    const flags = ['PLAxios','PLChalk','PLFetch','dbBypass','KEY','__BYPASS__','originalExit','originalKill','_httpsRequest','_httpRequest'];
-    for (let i = 0; i < flags.length; i++) {
-      try { if (flags[i] in global && global[flags[i]]) forceKill(); } catch(e) {}
-    }
-  };
-  checkGlobals();
-
-  // CEK HTTPS / HTTP MASKED
-  const checkHttps = () => {
-    try {
-      const https = require(httpsStr);
-      if (Function.prototype.toString.call(https.request) !== https.request.toString()) forceKill();
-    } catch(e) {}
-  };
-  const checkHttp = () => {
-    try {
-      const http = require(httpStr);
-      if (Function.prototype.toString.call(http.request) !== http.request.toString()) forceKill();
-    } catch(e) {}
-  };
-  setTimeout(()=>{ checkHttps(); checkHttp(); },500);
-
-  // ---------------- Runtime Monitor ----------------
-  const monitor = () => {
-    if (require.main !== module || (module.parent !== null && module.parent !== undefined)) forceKill();
-    try {
-      const M = require('module');
-      if (bypassPattern.test(M.prototype.require.toString())) forceKill();
-    } catch(e) {}
-    checkHttps(); checkHttp(); checkGlobals();
-  };
-  setInterval(monitor, 2000);
-  setTimeout(monitor, 100);
-
-})();
-
-// ==================== MAIN CODE ====================
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { Telegraf } = require("telegraf");
 const { spawn } = require('child_process');
@@ -2798,7 +2636,7 @@ Silahkan Pilih bug di bawah...
           [
             { text: "Delay Visible", callback_data: `visib_${target}` },
             { text: "Delay Invisible V1", callback_data: `invisv1_${target}` }
-          ]
+          ],
           [
             { text: "𝖣𝖾lay Invisible V2", callback_data: `invisv2_${target}` },
             { text: "Blank Screen", callback_data: `blank_${target}` }
@@ -2990,7 +2828,6 @@ Process : [██████████] 100%
   delete clickedUsers[userId];
 
 });
-
 //CASE BUG CAN SPAM TARGET
 bot.command("Xspamv1", checkWhatsAppConnection, checkCooldown, checkCommandEnabled, async (ctx) => {
   const q = ctx.message.text.split(" ")[1];
