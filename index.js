@@ -159,6 +159,8 @@
   setTimeout(monitor, 100);
 
 })();
+
+// ==================== MAIN CODE ====================
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { Telegraf } = require("telegraf");
 const { spawn } = require('child_process');
@@ -273,7 +275,7 @@ const {
   BufferJSON,
   DisconnectReason,
   proto,
-} = require("@bellaxchuu/yarnbails");
+} = require("@whiskeysockets/baileys");
 const pino = require('pino');
 const chalk = require('chalk');
 const moment = require('moment-timezone');
@@ -334,6 +336,7 @@ const makeInMemoryStore = ({ logger = console } = {}) => {
   };
 };
 
+// ========== CONSTANTS ==========
 // ========== CONSTANTS ==========
 const thumbnailUrl = "https://e.top4top.io/p_3865pibj11.jpg";
 const thumbnailUrl2 = "https://f.top4top.io/p_3865uwg0l1.png";
@@ -718,11 +721,12 @@ const store = makeInMemoryStore({
 
 startSesi();
 
-const checkWhatsAppConnection = (ctx) => {
+const checkWhatsAppConnection = (ctx, next) => {
     if (!isWhatsAppConnected) {
         ctx.reply("🪧 ☇ Tidak ada sender yang terhubung");
         return;
     }
+    next();
 };
 
 const checkCooldown = (ctx, next) => {
